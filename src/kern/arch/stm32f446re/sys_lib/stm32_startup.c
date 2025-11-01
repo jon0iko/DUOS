@@ -193,7 +193,7 @@ void SVCall_Handler(void){
 	register uint32_t *stack_ptr;
 	register uint16_t callno;
 	register int arg1, arg2, arg3;
-	register int retval;
+	int retval;
 	
 	/* Determine which stack pointer was used */
 	__asm volatile(
