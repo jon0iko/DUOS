@@ -33,6 +33,9 @@
 #include <system_config.h>
 #include <UsartRingBuffer.h>
 #include <errno.h>
+#include <schedule.h>
+#include <stm32f446xx.h>
+#include <cm4.h>
 
 /* 
  * read() - Application layer library function
@@ -157,6 +160,153 @@ int32_t sys_write(int fd, const void *buf, size_t size)
 
     /* Unsupported file descriptor */
     return -EBADF;
+}
+
+/*
+ * exit_task() - Application layer library function
+ * Terminates the current task and triggers task switch
+ */
+void exit_task(void)
+{
+    __asm volatile(
+        "mov r0, %0\n"      /* syscall ID (SYS__exit) */
+        "svc #0\n"          /* Trigger SVC exception */
+        :
+        : "r"(SYS__exit)
+        : "r0"
+    );
+    /* This point should never be reached */
+    while(1);
+}
+
+/*
+ * getpid() - Application layer library function
+ * Returns the current task ID
+ */
+int32_t getpid(void)
+{
+    int32_t result;
+    __asm volatile(
+        "mov r0, %1\n"      /* syscall ID (SYS_getpid) */
+        "svc #0\n"          /* Trigger SVC exception */
+        "mov %0, r0\n"      /* Store return value */
+        : "=r"(result)
+        : "r"(SYS_getpid)
+        : "r0"
+    );
+    return result;
+}
+
+/*
+ * getSysTickTime() - Application layer library function
+ * Returns the elapsed time in milliseconds
+ */
+uint32_t getSysTickTime(void)
+{
+    uint32_t result;
+    __asm volatile(
+        "mov r0, %1\n"      /* syscall ID (SYS___time) */
+        "svc #0\n"          /* Trigger SVC exception */
+        "mov %0, r0\n"      /* Store return value */
+        : "=r"(result)
+        : "r"(SYS___time)
+        : "r0"
+    );
+    return result;
+}
+
+/*
+ * reboot() - Application layer library function
+ * Triggers a system reboot
+ */
+void reboot(void)
+{
+    __asm volatile(
+        "mov r0, %0\n"      /* syscall ID (SYS_reboot) */
+        "svc #0\n"          /* Trigger SVC exception */
+        :
+        : "r"(SYS_reboot)
+        : "r0"
+    );
+    /* This point should never be reached */
+    while(1);
+}
+
+/*
+ * yield() - Application layer library function
+ * Voluntarily yields the CPU to the next task
+ */
+void yield(void)
+{
+    __asm volatile(
+        "mov r0, %0\n"      /* syscall ID (SYS_yield) */
+        "svc #0\n"          /* Trigger SVC exception */
+        :
+        : "r"(SYS_yield)
+        : "r0"
+    );
+}
+
+/*
+ * sys_exit() - Kernel level exit function
+ * Terminates the current task and triggers rescheduling
+ */
+void sys_exit(void)
+{
+    TCB_TypeDef *task = get_current_task();
+    if (task != NULL) {
+        task->status = TASK_TERMINATED;
+        /* Trigger task switch */
+        trigger_pendsv();
+    }
+}
+
+/*
+ * sys_getpid() - Kernel level getpid function
+ * Returns the current task ID from TCB
+ */
+int32_t sys_getpid(void)
+{
+    TCB_TypeDef *task = get_current_task();
+    if (task != NULL) {
+        return (int32_t)task->task_id;
+    }
+    return -1;
+}
+
+/*
+ * sys_time() - Kernel level time function
+ * Returns the elapsed SysTick time in milliseconds
+ */
+uint32_t sys_time(void)
+{
+    return __getSysTickCount();
+}
+
+/*
+ * sys_reboot() - Kernel level reboot function
+ * Performs a software reset via SCB->AIRCR
+ */
+void sys_reboot(void)
+{
+    /* Disable interrupts */
+    __asm volatile("CPSID I");
+    
+    /* Perform system reset via AIRCR register */
+    /* Key: 0x5FA, SYSRESETREQ bit */
+    SCB->AIRCR = (0x5FA << 16) | (SCB->AIRCR & 0xFFFF) | (1 << 2);
+    
+    /* Wait for reset */
+    while(1);
+}
+
+/*
+ * sys_yield() - Kernel level yield function
+ * Triggers PendSV for voluntary context switch
+ */
+void sys_yield(void)
+{
+    trigger_pendsv();
 }
 
 #include <kunistd.h>

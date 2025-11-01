@@ -46,7 +46,7 @@
 * %f for floating point number
 */
 // Simplified version of printf
-void kprintf(char *format,...)
+void duprintf(char *format,...)
 {
 //write your code here
 	char *tr;
@@ -170,7 +170,7 @@ void putstr(const uint8_t *str,size_t size)
 }
 
 // Simplified version of scanf
-void kscanf(char *format,...)
+void duscanf(char *format,...)
 {
 //write your code here
 	va_list list;

@@ -30,6 +30,7 @@
  
 #include <stm32_startup.h>
 #include <syscall.h>
+#include <schedule.h>
 const uint32_t STACK_START = (uint32_t)SRAM_END;
 uint32_t NVIC_VECTOR[] __attribute__((section (".isr_vector")))={
 	STACK_START,
@@ -218,4 +219,67 @@ void SVCall_Handler(void){
 	stack_ptr[0] = (uint32_t)retval;
 }
 
+/*
+ * PendSV_Handler - Context Switch Handler
+ * Performs task switching using PSP (Process Stack Pointer)
+ * This handler is triggered by SysTick every 10ms or by yield()
+ */
+__attribute__((naked)) void PendSV_Handler(void)
+{
+	/* Disable interrupts during context switch */
+	__asm volatile("CPSID I");
+	
+	/* Save context of current task */
+	__asm volatile(
+		/* Get current PSP */
+		"MRS R0, PSP\n"
+		
+		/* Save R4-R11 onto the process stack */
+		"STMDB R0!, {R4-R11}\n"
+		
+		/* Save the updated PSP into current_task->psp */
+		"PUSH {LR}\n"
+		"BL get_current_task\n"  /* Returns current_task pointer in R0 */
+		"CMP R0, #0\n"
+		"BEQ pendsv_skip_save\n"
+		"POP {LR}\n"
+		"PUSH {LR}\n"
+		"MRS R1, PSP\n"
+		"SUB R1, R1, #32\n"      /* Adjust for saved R4-R11 (8 registers * 4 bytes) */
+		"STR R1, [R0, #8]\n"     /* Store PSP at offset 8 (TCB.psp) */
+		
+		"pendsv_skip_save:\n"
+		"POP {LR}\n"
+		
+		/* Call scheduler to select next task */
+		"PUSH {LR}\n"
+		"BL schedule\n"
+		"POP {LR}\n"
+		
+		/* Load context of next task */
+		"PUSH {LR}\n"
+		"BL get_current_task\n"  /* Returns new current_task pointer in R0 */
+		"CMP R0, #0\n"
+		"BEQ pendsv_exit\n"
+		"LDR R1, [R0, #8]\n"     /* Load PSP from offset 8 (TCB.psp) */
+		"POP {LR}\n"
+		
+		/* Restore R4-R11 from the new process stack */
+		"LDMIA R1!, {R4-R11}\n"
+		
+		/* Update PSP to new task's stack */
+		"MSR PSP, R1\n"
+		
+		/* Enable interrupts */
+		"CPSIE I\n"
+		
+		/* Return to thread mode using PSP */
+		"BX LR\n"
+		
+		"pendsv_exit:\n"
+		"POP {LR}\n"
+		"CPSIE I\n"
+		"BX LR\n"
+	);
+}
 

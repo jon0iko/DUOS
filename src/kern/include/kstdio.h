@@ -33,8 +33,13 @@
 #include <stdint.h>
 #include <types.h>
 
-void kprintf(char*,...); 
-void kscanf(char*,...);
+void duprintf(char*,...); 
+void duscanf(char*,...);
 void putstr(const uint8_t*,size_t);
+
+/* Legacy aliases for compatibility */
+#define kprintf duprintf
+#define kscanf duscanf
+
 #endif /* KSTDIO */
 

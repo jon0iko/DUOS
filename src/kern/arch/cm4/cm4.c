@@ -32,8 +32,10 @@
 #include <sys_clock.h>
 #include <syscall.h>
 #include <sys_timer.h>
+#include <schedule.h>
 
 volatile uint32_t tick_counter = 0;
+volatile uint32_t tick_10ms_counter = 0;
 
 void __SysTick_init(uint32_t reload)
 {
@@ -97,6 +99,14 @@ uint32_t __get__Hour(void)
 void SysTick_Handler(void)
 {
     tick_counter++;
+    tick_10ms_counter++;
+    
+    /* Trigger PendSV every 10ms for task scheduling */
+    if (tick_10ms_counter >= 10) {
+        tick_10ms_counter = 0;
+        /* Trigger PendSV for context switch */
+        trigger_pendsv();
+    }
 }
 
 void __enable_fpu()

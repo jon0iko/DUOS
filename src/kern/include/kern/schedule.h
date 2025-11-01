@@ -31,6 +31,45 @@
 #ifndef __SCHEDULE_H
 #define __SCHEDULE_H
 
+#include <stdint.h>
+#include <types.h>
+
+/* Maximum number of tasks */
+#define MAX_TASKS 8
+
+/* Task stack sizes */
+#define TASK_STACK_SIZE 1024  // 1KB per task
+
+/* Global task management */
+extern TCB_TypeDef task_list[MAX_TASKS];
+extern TCB_TypeDef *current_task;
+extern uint32_t num_tasks;
+extern uint32_t next_task_id;
+
+/* Task stack memory (allocated statically) */
+extern uint32_t task_stacks[MAX_TASKS][TASK_STACK_SIZE / 4];
+
+/* Scheduler functions */
+void scheduler_init(void);
+void schedule(void);
+TCB_TypeDef* get_current_task(void);
+TCB_TypeDef* get_next_task(void);
+void switch_context(void);
+void trigger_pendsv(void);
+
+/* Task management functions */
+int32_t task_create(void (*task_func)(void), uint8_t priority);
+void task_terminate(uint16_t task_id);
+void task_block(uint16_t task_id);
+void task_unblock(uint16_t task_id);
+TCB_TypeDef* get_task_by_id(uint16_t task_id);
+
+/* Stack initialization */
+void* init_task_stack(void *stack_top, void (*task_func)(void));
+
+/* Idle task */
+void idle_task(void);
+
 #endif
 
 

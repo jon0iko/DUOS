@@ -36,65 +36,150 @@
 #include <kstdio.h>
 #include <sys_rtc.h>
 #include <kstring.h>
+#include <schedule.h>
+#include <kunistd.h>
+
 #ifndef DEBUG
 #define DEBUG 1
 #endif
+
+/* Task function prototypes */
+void task1(void);
+void task2(void);
+void task3(void);
+
+/* Task 1: Prints messages and tests getpid and time syscalls */
+void task1(void)
+{
+    while (1)
+    {
+        int32_t pid = getpid();
+        uint32_t time = getSysTickTime();
+        
+        duprintf("[Task 1] PID: %d, Time: %d ms\r\n", pid, time);
+        duprintf("[Task 1] Testing SYS_write and SYS_read...\r\n");
+        
+        /* Delay using yield to allow other tasks to run */
+        for (int i = 0; i < 5; i++) {
+            yield();
+        }
+    }
+}
+
+/* Task 2: Tests string I/O */
+void task2(void)
+{
+    uint8_t input_buffer[64];
+    int count = 0;
+    
+    while (1)
+    {
+        int32_t pid = getpid();
+        uint32_t time = getSysTickTime();
+        
+        duprintf("[Task 2] PID: %d, Time: %d ms\r\n", pid, time);
+        duprintf("[Task 2] Count: %d\r\n", count++);
+        
+        if (count == 3) {
+            duprintf("[Task 2] Enter your name: ");
+            duscanf("%s", input_buffer);
+            duprintf("\r\n[Task 2] Hello, %s!\r\n", input_buffer);
+        }
+        
+        /* Delay using yield */
+        for (int i = 0; i < 5; i++) {
+            yield();
+        }
+    }
+}
+
+/* Task 3: Tests number I/O and yield */
+void task3(void)
+{
+    uint32_t counter = 0;
+    
+    while (1)
+    {
+        int32_t pid = getpid();
+        uint32_t time = getSysTickTime();
+        
+        duprintf("[Task 3] PID: %d, Time: %d ms, Counter: %d\r\n", pid, time, counter);
+        counter++;
+        
+        if (counter == 10) {
+            duprintf("[Task 3] Demonstrating voluntary yield...\r\n");
+            yield();
+            counter = 0;
+        }
+        
+        /* Delay using yield */
+        for (int i = 0; i < 5; i++) {
+            yield();
+        }
+    }
+}
 
 void kmain(void)
 {
     /* Initialize all STM32 board components */
     __sys_init();
     
-    /* Test SYS_write using kprintf */
-    kprintf("\r\n");
-    kprintf("===================================\r\n");
-    kprintf("DUOS - Syscall Test Program\r\n");
-    kprintf("Testing SYS_read and SYS_write\r\n");
-    kprintf("===================================\r\n");
-    kprintf("\r\n");
+    /* Initialize scheduler */
+    scheduler_init();
     
-    /* Main test loop */
+    /* Print banner using duprintf */
+    duprintf("\r\n");
+    duprintf("===================================================\r\n");
+    duprintf("    DUOS - Task Scheduling and Syscall Demo\r\n");
+    duprintf("===================================================\r\n");
+    duprintf("Testing Implementation:\r\n");
+    duprintf("  - SYS_read and SYS_write\r\n");
+    duprintf("  - SYS_getpid\r\n");
+    duprintf("  - SYS_time\r\n");
+    duprintf("  - SYS_yield\r\n");
+    duprintf("  - SYS_exit\r\n");
+    duprintf("  - SYS_reboot (use command to test)\r\n");
+    duprintf("  - Task Scheduling (Round-Robin, 10ms time slice)\r\n");
+    duprintf("  - Context Switching via PendSV\r\n");
+    duprintf("===================================================\r\n");
+    duprintf("\r\n");
+    
+    /* Create user tasks */
+    duprintf("Creating tasks...\r\n");
+    int32_t tid1 = task_create(task1, 1);
+    duprintf("Task 1 created with ID: %d\r\n", tid1);
+    
+    int32_t tid2 = task_create(task2, 1);
+    duprintf("Task 2 created with ID: %d\r\n", tid2);
+    
+    int32_t tid3 = task_create(task3, 1);
+    duprintf("Task 3 created with ID: %d\r\n", tid3);
+    
+    duprintf("\r\n");
+    duprintf("Starting scheduler...\r\n");
+    duprintf("Tasks will switch every 10ms (SysTick)\r\n");
+    duprintf("---------------------------------------------------\r\n");
+    duprintf("\r\n");
+    
+    /* Small delay before starting task switching */
+    ms_delay(2000);
+    
+    /* Set PSP to first task's stack pointer */
+    TCB_TypeDef *first_task = get_current_task();
+    if (first_task != NULL) {
+        __asm volatile("MSR PSP, %0" : : "r"(first_task->psp));
+        __asm volatile("MSR CONTROL, %0" : : "r"(0x03)); /* Use PSP, unprivileged mode */
+        __asm volatile("ISB");
+    }
+    
+    /* Jump to first task */
+    duprintf("Jumping to first task...\r\n\r\n");
+    
+    /* Infinite loop - tasks will run via context switching */
     while (1)
     {
-        uint8_t input_buffer[256];
-        uint32_t number;
-        
-        /* Test 1: String input/output */
-        kprintf("Test 1: String I/O\r\n");
-        kprintf("Enter your name: ");
-        kscanf("%s", input_buffer);
-        kprintf("\r\nHello, %s!\r\n", input_buffer);
-        kprintf("\r\n");
-        
-        ms_delay(1000);
-        
-        /* Test 2: Integer input/output */
-        kprintf("Test 2: Integer I/O\r\n");
-        kprintf("Enter a number: ");
-        kscanf("%d", &number);
-        kprintf("\r\nYou entered: %d\r\n", number);
-        kprintf("In hex: 0x%x\r\n", number);
-        kprintf("In octal: %o\r\n", number);
-        kprintf("\r\n");
-        
-        ms_delay(1000);
-        
-        /* Test 3: Character input/output */
-        kprintf("Test 3: Character I/O\r\n");
-        kprintf("Enter a character: ");
-        uint8_t ch;
-        kscanf("%c", &ch);
-        kprintf("\r\nYou entered: '%c' (ASCII: %d)\r\n", ch, ch);
-        kprintf("\r\n");
-        
-        ms_delay(2000);
-        
-        /* Repeat tests */
-        kprintf("-----------------------------------\r\n");
-        kprintf("Repeating tests in 3 seconds...\r\n");
-        kprintf("-----------------------------------\r\n");
-        kprintf("\r\n");
-        ms_delay(3000);
+        /* Main loop - tasks are scheduled by PendSV */
+        yield();
     }
 }
 

@@ -47,5 +47,19 @@ int32_t write(int fd, const void *buf, size_t size);
 int32_t sys_read(int fd, void *buf, size_t size);
 int32_t sys_write(int fd, const void *buf, size_t size);
 
+/* Additional syscall library functions */
+void exit_task(void);
+int32_t getpid(void);
+uint32_t getSysTickTime(void);
+void reboot(void);
+void yield(void);
+
+/* Kernel service functions */
+void sys_exit(void);
+int32_t sys_getpid(void);
+uint32_t sys_time(void);
+void sys_reboot(void);
+void sys_yield(void);
+
 #endif /* KERN_UNISTD_H */
 

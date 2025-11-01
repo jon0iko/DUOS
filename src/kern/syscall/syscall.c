@@ -50,14 +50,27 @@ void syscall(uint16_t callno, int arg1, int arg2, int arg3, int *retval)
 			*retval = sys_write(arg1, (const void *)arg2, (size_t)arg3);
 			break;
 		case SYS_reboot:
+			/* Reboot the system */
+			sys_reboot();
+			*retval = 0;  /* Should never reach here */
 			break;	
 		case SYS__exit:
+			/* Terminate current task */
+			sys_exit();
+			*retval = 0;  /* Should never return */
 			break;
 		case SYS_getpid:
+			/* Get current task ID */
+			*retval = sys_getpid();
 			break;
 		case SYS___time:
+			/* Get elapsed SysTick time in milliseconds */
+			*retval = (int)sys_time();
 			break;
 		case SYS_yield:
+			/* Yield CPU to next task */
+			sys_yield();
+			*retval = 0;
 			break;				
 		/* return error code see error.h and errmsg.h ENOSYS sys_errlist[ENOSYS]*/	
 		default: 

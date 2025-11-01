@@ -93,14 +93,38 @@ typedef enum
 } ErrorStatus;
 
 
-typedef struct task_tcb{
-	uint32_t magic_number; //here it is 0xFECABAA0
-	uint16_t task_id; //a unsigned 16 bit integer starting from 1000 
-	void *psp; //task stack pointer or stackframe address
-	uint16_t status; //task status: running, waiting, ready, killed, or terminated
-	uint32_t execution_time; //total execution time (in ms)
-	uint32_t waiting_time; //total waiting time (in ms)
-	uint32_t digital_sinature; //current value is 0x00000001
+/* Task States */
+#define TASK_NEW         0
+#define TASK_READY       1
+#define TASK_RUNNING     2
+#define TASK_BLOCKED     3
+#define TASK_TERMINATED  4
+
+/* TCB Magic Number and Signature */
+#define TCB_MAGIC_NUMBER 0xFECABAA0
+#define TCB_SIGNATURE    0x00000001
+
+/* Maximum values */
+#define MAX_CHILD_TASKS  16
+#define MAX_OPEN_RESOURCES 8
+
+typedef struct t_task_tcb {
+	uint32_t magic_number;      // Magic number 0xFECABAA0
+	uint16_t task_id;           // Unique task ID starting from 1000
+	void *psp;                  // Process Stack Pointer
+	uint16_t status;            // Task status: new, ready, running, blocked, terminated
+	uint8_t priority;           // Task priority (0 = highest)
+	uint16_t parent_id;         // Parent task ID
+	uint32_t execution_time;    // Total execution time in milliseconds
+	uint32_t waiting_time;      // Total waiting time in milliseconds
+	uint32_t digital_signature; // Digital signature 0x00000001
+	uint32_t w_chld[MAX_CHILD_TASKS]; // Array of child task IDs
+	uint32_t *heap_mem_start;   // Pointer to heap memory start
+	uint32_t heap_mem_size;     // Size of heap memory
+	uint32_t *open_resources[MAX_OPEN_RESOURCES]; // Array of open file descriptors/resources
+	uint8_t sem_waiting_count;  // Number of semaphores waiting on
+	uint8_t mutex_locked_count; // Number of mutexes locked
+	uint32_t last_wakeup_time;  // Last wakeup time for sleep operations
 } TCB_TypeDef;
 
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050) /* ARM Compiler V6 */
