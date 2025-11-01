@@ -1,0 +1,431 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+SRAM             0x20000000         0x00020000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD object/kmath.o
+LOAD object/kfloat.o
+LOAD object/cm4.o
+LOAD object/mcu_info.o
+LOAD object/kstring.o
+LOAD object/kmain.o
+LOAD object/stm32_startup.o
+LOAD object/sys_clock.o
+LOAD object/sys_usart.o
+LOAD object/sys_gpio.o
+LOAD object/kstdio.o
+LOAD object/sys_init.o
+LOAD object/unistd.o
+LOAD object/times.o
+LOAD object/serial_lin.o
+LOAD object/UsartRingBuffer.o
+LOAD object/debug.o
+LOAD object/timer.o
+LOAD object/sys_err.o
+LOAD object/sys_rtc.o
+
+.text           0x08000000     0x47dc
+                0x08000000                _stext = .
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x1c4 object/stm32_startup.o
+                0x08000000                NVIC_VECTOR
+ *(.text)
+ .text          0x080001c4       0x4e object/kmath.o
+                0x080001c4                __pow
+ *fill*         0x08000212        0x2 
+ .text          0x08000214      0xf10 object/kfloat.o
+                0x08000214                __aeabi_f2d
+                0x080002da                __aeabi_d2f
+                0x08000362                __aeabi_d2iz
+                0x080003f2                __aeabi_d2i
+                0x08000482                get_decimal_part
+                0x0800056c                __aeabi_ui2d
+                0x080005ec                __aeabi_d2uiz
+                0x08000662                __aeabi_dsub
+                0x0800093c                __aeabi_dmul
+                0x08000af2                __aeabi_dadd
+                0x08000dba                __aeabi_d2ulz
+                0x08000e38                __aeabi_ddiv
+                0x080010e4                __aeabi_dcmpeq
+ .text          0x08001124      0x258 object/cm4.o
+                0x08001124                __SysTick_init
+                0x08001170                SysTickIntDisable
+                0x08001190                SysTickIntEnable
+                0x080011b0                __SysTick_enable
+                0x080011d0                __sysTick_disable
+                0x080011f0                __getSysTickCount
+                0x08001208                __updateSysTick
+                0x08001228                __getTime
+                0x08001240                __get__Second
+                0x08001264                __get__Minute
+                0x08001288                __get__Hour
+                0x080012ac                SysTick_Handler
+                0x080012c8                __enable_fpu
+                0x080012ec                ms_delay
+                0x08001320                getmsTick
+                0x08001338                wait_until
+                0x0800136c                SYS_SLEEP_WFI
+ .text          0x0800137c      0x1a8 object/mcu_info.o
+                0x0800137c                show_system_info
+                0x08001428                store_product_id
+                0x08001510                get_product_id
+ .text          0x08001524      0x91c object/kstring.o
+                0x08001524                __str_to_num
+                0x08001606                __reverse_str
+                0x08001664                __strlen
+                0x08001692                convert
+                0x08001710                convertu32
+                0x08001768                float2str
+                0x08001834                str2float
+                0x08001936                kmemset
+                0x08001982                StrCat
+                0x080019cc                strcopy
+                0x08001a06                clear_str
+                0x08001a44                strncopy
+                0x08001a96                strn4mcopy
+                0x08001ae4                byte_to_hex
+                0x08001b58                show_byte_hex_str
+                0x08001ba0                show_byte_stream_hex
+                0x08001be0                strcomp
+                0x08001c30                strncopy_cmd
+                0x08001c7e                uint16_to_str
+                0x08001dd0                strCat_n_to_m
+ .text          0x08001e40       0x1c object/kmain.o
+                0x08001e40                kmain
+ .text          0x08001e5c       0xe0 object/stm32_startup.o
+                0x08001e5c                Reset_Handler
+                0x08001f14                FLASH_Handler
+                0x08001f14                SPI4_Handler
+                0x08001f14                DMA2_Stream7_Handler
+                0x08001f14                OTG_HS_Handler
+                0x08001f14                OTG_FS_WKUP_Handler
+                0x08001f14                DMA2_Stream3_Handler
+                0x08001f14                USART3_Handler
+                0x08001f14                PendSV_Handler
+                0x08001f14                NMI_Handler
+                0x08001f14                SAI1_Handler
+                0x08001f14                TIM6_DAC_Handler
+                0x08001f14                CAN1_RX1_Handler
+                0x08001f14                EXTI15_10_Handler
+                0x08001f14                ADC_Handler
+                0x08001f14                I2C1_EV_Handler
+                0x08001f14                TAMP_STAMP_Handler
+                0x08001f14                I2C3_ER_Handler
+                0x08001f14                WWDG_Handler
+                0x08001f14                EXTI4_Handler
+                0x08001f14                I2C3_EV_Handler
+                0x08001f14                DMA1_Stream1_Handler
+                0x08001f14                DMA2_Stream4_Handler
+                0x08001f14                DMA1_Stream7_Handler
+                0x08001f14                OTG_FS_Handler
+                0x08001f14                TIM1_BRK_TIM9_Handler
+                0x08001f14                I2C1_ER_Handler
+                0x08001f14                DMA1_Stream3_Handler
+                0x08001f14                UsageFault_Handler
+                0x08001f14                TIM1_UP_TIM10_Handler
+                0x08001f14                CAN1_RX0_Handler
+                0x08001f14                TIM1_CC_Handler
+                0x08001f14                I2C2_ER_Handler
+                0x08001f14                TIM8_CC_Handler
+                0x08001f14                HDMI_CEC_Handler
+                0x08001f14                SAI2_Handler
+                0x08001f14                CAN1_SCE_Handler
+                0x08001f14                DMA1_Stream0_Handler
+                0x08001f14                OTG_HS_EP1_OUT_Handler
+                0x08001f14                EXTI1_Handler
+                0x08001f14                RTC_WKUP_Handler
+                0x08001f14                FMC_Handler
+                0x08001f14                EXTI3_Handler
+                0x08001f14                EXTI2_Handler
+                0x08001f14                UART4_Handler
+                0x08001f14                CAN2_RX1_Handler
+                0x08001f14                EXTI9_5_Handler
+                0x08001f14                USART1_Handler
+                0x08001f14                CAN2_SCE_Handler
+                0x08001f14                TIM3_Handler
+                0x08001f14                DMA2_Stream6_Handler
+                0x08001f14                Default_Handler
+                0x08001f14                DCMI_Handler
+                0x08001f14                TIM1_TRG_COM_TIM11_Handler
+                0x08001f14                RTC_Alarm_Handler
+                0x08001f14                TIM4_Handler
+                0x08001f14                TIM8_UP_TIM13_Handler
+                0x08001f14                CAN2_TX_Handler
+                0x08001f14                SPI2_Handler
+                0x08001f14                DMA2_Stream1_Handler
+                0x08001f14                DMA1_Stream2_Handler
+                0x08001f14                OTG_HS_WKUP_Handler
+                0x08001f14                EXTI0_Handler
+                0x08001f14                TIM8_BRK_TIM12_Handler
+                0x08001f14                CAN2_RX0_Handler
+                0x08001f14                DMA2_Stream5_Handler
+                0x08001f14                DMA1_Stream6_Handler
+                0x08001f14                SDIO_Handler
+                0x08001f14                FMPI2C1_ERR_Handler
+                0x08001f14                SPI1_Handler
+                0x08001f14                I2C2_EV_Handler
+                0x08001f14                SPDIF_Rx_Handler
+                0x08001f14                DMA2_Stream2_Handler
+                0x08001f14                SPI3_Handler
+                0x08001f14                DMA2_Stream0_Handler
+                0x08001f14                RCC_Handler
+                0x08001f14                PVD_Handler
+                0x08001f14                UART5_Handler
+                0x08001f14                DMA1_Stream5_Handler
+                0x08001f14                TIM5_Handler
+                0x08001f14                QuadSPI_Handler
+                0x08001f14                TIM7_Handler
+                0x08001f14                TIM8_TRG_COM_TIM14_Handler
+                0x08001f14                CAN1_TX_Handler
+                0x08001f14                FPU_Handler
+                0x08001f14                FMPI2C1_Handler
+                0x08001f14                DebugMonitor_Handler
+                0x08001f14                DMA1_Stream4_Handler
+                0x08001f14                OTG_HS_EP1_IN_Handler
+                0x08001f1a                HardFault_Handler
+                0x08001f20                MemManage_Handler
+                0x08001f26                BusFault_Handler
+                0x08001f2c                SVCall_Handler
+ .text          0x08001f3c      0x308 object/sys_clock.o
+                0x08001f3c                __init_sys_clock
+                0x08002008                __APB1CLK_FREQ
+                0x08002084                __APB2CLK_FREQ
+                0x08002100                __PLL_SYS_CLK
+                0x08002198                __AHB_CLK
+ .text          0x08002244      0x584 object/sys_usart.o
+                0x080022f4                UART_Init
+                0x0800238e                UART_DeInit
+                0x080023fc                UART_BRR_SAMPLING16
+                0x08002590                UART_MspInit
+ .text          0x080027c8      0x5c0 object/sys_gpio.o
+                0x080027c8                GPIO_WritePin
+                0x080027fc                GPIO_Init
+                0x08002b04                GPIO_DeInit
+                0x08002cec                SPI_GPIOInit
+ .text          0x08002d88      0x350 object/kstdio.o
+                0x08002d88                kprintf
+                0x08002f1c                putstr
+                0x08002f68                kscanf
+ .text          0x080030d8      0x140 object/sys_init.o
+                0x08003120                __sys_init
+                0x080031dc                SYS_ROUTINE
+                0x080031e8                display_group_info
+ .text          0x08003218        0x0 object/unistd.o
+ .text          0x08003218        0x0 object/times.o
+ .text          0x08003218      0x1b8 object/serial_lin.o
+                0x08003218                SerialLin2_init
+                0x080032b0                SerialLin6_init
+                0x08003348                USART2_Handler
+                0x0800335c                USART6_Handler
+                0x08003370                noIntWrite
+                0x080033a0                noIntSendString
+ .text          0x080033d0      0xb7c object/UsartRingBuffer.o
+                0x080033d0                Ringbuf_init
+                0x0800346a                Look_for
+                0x0800350a                GetDataFromBuffer
+                0x0800364a                Uart_flush
+                0x08003686                Uart_peek
+                0x08003700                Uart_read
+                0x080037a0                Uart_write
+                0x08003858                IsDataAvailable
+                0x080038dc                Get_after
+                0x0800393a                Uart_sendstring
+                0x08003968                Uart_printbase
+                0x08003a00                Copy_upto
+                0x08003b00                Wait_for
+                0x08003bea                look_for_frame
+                0x08003d50                Uart_isr
+                0x08003e5e                update_tail
+                0x08003ec4                debug_buffer
+ .text          0x08003f4c      0x110 object/debug.o
+                0x08003f4c                __debugRamUsage
+                0x08003f98                __digitalWriteDebugButton
+                0x08003ff4                __digitalReadDebugButton
+                0x08004024                __alalogReadDebug
+                0x0800403c                __analogWriteDebug
+ .text          0x0800405c      0x228 object/timer.o
+                0x08004098                ConfigTimer2ForSystem
+                0x08004114                Delay_micro_second
+                0x080041a8                Delay
+                0x080041d6                getMiliseconds
+                0x08004218                getMicroseconds
+                0x08004248                TIM2_Handler
+ .text          0x08004284       0x12 object/sys_err.o
+                0x08004284                Error_Handler
+ *fill*         0x08004296        0x2 
+ .text          0x08004298      0x364 object/sys_rtc.o
+                0x08004298                SYS_RTC_init
+                0x08004540                get_timeofDay
+ *(.rodata)
+ .rodata        0x080045fc       0x64 object/mcu_info.o
+ .rodata        0x08004660        0xa object/kstring.o
+ *fill*         0x0800466a        0x2 
+ .rodata        0x0800466c        0x7 object/kmain.o
+ *fill*         0x08004673        0x1 
+ .rodata        0x08004674        0x4 object/stm32_startup.o
+                0x08004674                STACK_START
+ .rodata        0x08004678       0x18 object/sys_clock.o
+                0x08004678                AHBPrescTable
+                0x08004688                APBPrescTable
+ .rodata        0x08004690      0x14b object/sys_init.o
+                0x080047dc                . = ALIGN (0x4)
+ *fill*         0x080047db        0x1 
+                0x080047dc                _etext = .
+                0x080047dc                _la_data = LOADADDR (.data)
+
+.glue_7         0x080047dc        0x0
+ .glue_7        0x080047dc        0x0 linker stubs
+
+.glue_7t        0x080047dc        0x0
+ .glue_7t       0x080047dc        0x0 linker stubs
+
+.vfp11_veneer   0x080047dc        0x0
+ .vfp11_veneer  0x080047dc        0x0 linker stubs
+
+.v4_bx          0x080047dc        0x0
+ .v4_bx         0x080047dc        0x0 linker stubs
+
+.iplt           0x080047dc        0x0
+ .iplt          0x080047dc        0x0 object/kfloat.o
+
+.rel.dyn        0x080047dc        0x0
+ .rel.iplt      0x080047dc        0x0 object/kfloat.o
+
+.data           0x20000000       0x6c load address 0x080047dc
+                0x20000000                _sdata = .
+ *(.data)
+ .data          0x20000000        0x0 object/kmath.o
+ .data          0x20000000        0x0 object/kfloat.o
+ .data          0x20000000        0x0 object/cm4.o
+ .data          0x20000000        0x0 object/mcu_info.o
+ .data          0x20000000       0x61 object/kstring.o
+ .data          0x20000061        0x0 object/kmain.o
+ .data          0x20000061        0x0 object/stm32_startup.o
+ .data          0x20000061        0x0 object/sys_clock.o
+ .data          0x20000061        0x0 object/sys_usart.o
+ .data          0x20000061        0x0 object/sys_gpio.o
+ .data          0x20000061        0x0 object/kstdio.o
+ .data          0x20000061        0x0 object/sys_init.o
+ .data          0x20000061        0x0 object/unistd.o
+ .data          0x20000061        0x0 object/times.o
+ *fill*         0x20000061        0x3 
+ .data          0x20000064        0x8 object/serial_lin.o
+                0x20000064                errObj
+ .data          0x2000006c        0x0 object/UsartRingBuffer.o
+ .data          0x2000006c        0x0 object/debug.o
+ .data          0x2000006c        0x0 object/timer.o
+ .data          0x2000006c        0x0 object/sys_err.o
+ .data          0x2000006c        0x0 object/sys_rtc.o
+                0x2000006c                . = ALIGN (0x4)
+                0x2000006c                _edata = .
+
+.igot.plt       0x2000006c        0x0 load address 0x08004848
+ .igot.plt      0x2000006c        0x0 object/kfloat.o
+
+.bss            0x2000006c      0x8f9 load address 0x08004848
+                0x2000006c                _sbss = .
+ *(.bss)
+ .bss           0x2000006c        0x0 object/kmath.o
+ .bss           0x2000006c        0x0 object/kfloat.o
+ .bss           0x2000006c        0x4 object/cm4.o
+                0x2000006c                tick_counter
+ .bss           0x20000070       0x14 object/mcu_info.o
+ .bss           0x20000084       0x32 object/kstring.o
+ .bss           0x200000b6        0x0 object/kmain.o
+ *fill*         0x200000b6        0x2 
+ .bss           0x200000b8        0xc object/stm32_startup.o
+                0x200000b8                _bss_size
+                0x200000bc                _data_size
+                0x200000c0                _text_size
+ .bss           0x200000c4        0x0 object/sys_clock.o
+ .bss           0x200000c4        0x0 object/sys_usart.o
+ .bss           0x200000c4        0x0 object/sys_gpio.o
+ .bss           0x200000c4        0x0 object/kstdio.o
+ .bss           0x200000c4        0x0 object/sys_init.o
+ .bss           0x200000c4        0x0 object/unistd.o
+ .bss           0x200000c4        0x0 object/times.o
+ .bss           0x200000c4      0x890 object/serial_lin.o
+                0x200000c4                huart2
+                0x2000050c                huart6
+ .bss           0x20000954        0x0 object/UsartRingBuffer.o
+ .bss           0x20000954        0xc object/debug.o
+                0x20000958                CURRENT_MSP
+                0x2000095c                DEBUG_BUTTON
+                0x2000095e                DEBUG_ANALOG_IO
+ .bss           0x20000960        0x5 object/timer.o
+ .bss           0x20000965        0x0 object/sys_err.o
+ .bss           0x20000965        0x0 object/sys_rtc.o
+                0x20000965                _ebss = .
+OUTPUT(build/final.elf elf32-littlearm)
+LOAD linker stubs
+
+.comment        0x00000000       0x49
+ .comment       0x00000000       0x49 object/kmath.o
+                                 0x4a (size before relaxing)
+ .comment       0x00000049       0x4a object/kfloat.o
+ .comment       0x00000049       0x4a object/cm4.o
+ .comment       0x00000049       0x4a object/mcu_info.o
+ .comment       0x00000049       0x4a object/kstring.o
+ .comment       0x00000049       0x4a object/kmain.o
+ .comment       0x00000049       0x4a object/stm32_startup.o
+ .comment       0x00000049       0x4a object/sys_clock.o
+ .comment       0x00000049       0x4a object/sys_usart.o
+ .comment       0x00000049       0x4a object/sys_gpio.o
+ .comment       0x00000049       0x4a object/kstdio.o
+ .comment       0x00000049       0x4a object/sys_init.o
+ .comment       0x00000049       0x4a object/unistd.o
+ .comment       0x00000049       0x4a object/times.o
+ .comment       0x00000049       0x4a object/serial_lin.o
+ .comment       0x00000049       0x4a object/UsartRingBuffer.o
+ .comment       0x00000049       0x4a object/debug.o
+ .comment       0x00000049       0x4a object/timer.o
+ .comment       0x00000049       0x4a object/sys_err.o
+ .comment       0x00000049       0x4a object/sys_rtc.o
+
+.ARM.attributes
+                0x00000000       0x32
+ .ARM.attributes
+                0x00000000       0x32 object/kmath.o
+ .ARM.attributes
+                0x00000032       0x32 object/kfloat.o
+ .ARM.attributes
+                0x00000064       0x32 object/cm4.o
+ .ARM.attributes
+                0x00000096       0x32 object/mcu_info.o
+ .ARM.attributes
+                0x000000c8       0x32 object/kstring.o
+ .ARM.attributes
+                0x000000fa       0x32 object/kmain.o
+ .ARM.attributes
+                0x0000012c       0x32 object/stm32_startup.o
+ .ARM.attributes
+                0x0000015e       0x32 object/sys_clock.o
+ .ARM.attributes
+                0x00000190       0x32 object/sys_usart.o
+ .ARM.attributes
+                0x000001c2       0x32 object/sys_gpio.o
+ .ARM.attributes
+                0x000001f4       0x32 object/kstdio.o
+ .ARM.attributes
+                0x00000226       0x32 object/sys_init.o
+ .ARM.attributes
+                0x00000258       0x32 object/unistd.o
+ .ARM.attributes
+                0x0000028a       0x32 object/times.o
+ .ARM.attributes
+                0x000002bc       0x32 object/serial_lin.o
+ .ARM.attributes
+                0x000002ee       0x32 object/UsartRingBuffer.o
+ .ARM.attributes
+                0x00000320       0x32 object/debug.o
+ .ARM.attributes
+                0x00000352       0x32 object/timer.o
+ .ARM.attributes
+                0x00000384       0x32 object/sys_err.o
+ .ARM.attributes
+                0x000003b6       0x32 object/sys_rtc.o
