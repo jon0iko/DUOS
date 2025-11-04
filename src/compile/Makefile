@@ -73,6 +73,7 @@ debug.o \
 sys_spi.o \
 sys_err.o \
 sys_rtc.o \
+thread.o \
 duos \
 final.elf
 
@@ -141,6 +142,9 @@ serial_lin.o: $(OS_PATH)/lib/kern/serial_lin.c
 UsartRingBuffer.o: $(OS_PATH)/lib/UsartRingBuffer.c
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
 
+thread.o: $(OS_PATH)/thread/thread.c
+	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
+
 debug.o:$(OS_PATH)/lib/sotom/debug.c
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
 
@@ -181,7 +185,8 @@ duos: $(OBJECT)/kmath.o \
 	$(OBJECT)/debug.o \
 	$(OBJECT)/timer.o \
 	$(OBJECT)/sys_err.o \
-	$(OBJECT)/sys_rtc.o  
+	$(OBJECT)/sys_rtc.o \
+	$(OBJECT)/thread.o  
 	
 
 	$(CC) $(LDFLAGS) $^ -o $(TARGET)/$@
@@ -211,7 +216,8 @@ final.elf: $(OBJECT)/kmath.o \
 	$(OBJECT)/debug.o \
 	$(OBJECT)/timer.o \
 	$(OBJECT)/sys_err.o \
-	$(OBJECT)/sys_rtc.o 
+	$(OBJECT)/sys_rtc.o \
+	$(OBJECT)/thread.o 
 	
 	
 	$(CC) $(LDFLAGS) $^ -o build/$@
